@@ -28,6 +28,7 @@ def decode_bencode_list(bencoded_value):
     unparsed = bencoded_value
     res = []
     while unparsed:
+        print(unparsed)
         if len(unparsed) == 0:
             break
         if chr(unparsed[0]) == "l":
