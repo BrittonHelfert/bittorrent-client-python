@@ -16,7 +16,8 @@ def decode_bencode(bencoded_value):
             raise ValueError("Invalid encoded value")
         return bencoded_value[first_colon_index + 1 :]
     elif chr(bencoded_value[0]) == "i" and chr(bencoded_value[-1]) == "e":
-        return str(bencoded_value[1:-1])
+        # return without quotations
+        return int(bencoded_value[1:-1])
     else:
         raise NotImplementedError("Not supported")
 
