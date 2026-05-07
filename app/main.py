@@ -19,7 +19,10 @@ def decode_bencode(bencoded_value):
         # return without quotations
         return int(bencoded_value[1:-1])
     elif chr(bencoded_value[0]) == "l":
-        return decode_bencode_list(bencoded_value[1:])
+        end_idx = bencoded_value.find(b"e")
+        if end_idx == -1:
+            raise ValueError("Invalid encoded value")
+        return decode_bencode_list(bencoded_value[1:end_idx])
     else:
         raise ValueError("Invalid encoded value")
 
@@ -31,7 +34,11 @@ def decode_bencode_list(bencoded_value):
         if len(unparsed) == 0:
             break
         if chr(unparsed[0]) == "l":
-            res.append(decode_bencode_list(bencoded_value[1:]))
+            end_idx = unparsed.find(b"e")
+            if end_idx == -1:
+                raise ValueError("Invalid encoded value")
+            res.append(decode_bencode_list(unparsed[1:end_idx]))
+            unparsed = unparsed[end_idx + 1 :]
         if chr(unparsed[0]).isdigit():
             first_colon_index = unparsed.find(b":")
             if first_colon_index == -1:
