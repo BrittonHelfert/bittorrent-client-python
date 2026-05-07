@@ -30,6 +30,8 @@ def decode_bencode_list(bencoded_value):
     while unparsed:
         if len(unparsed) == 0:
             break
+        if chr(unparsed[0]) == "l":
+            res.append(decode_bencode_list(bencoded_value[1:]))
         if chr(unparsed[0]).isdigit():
             first_colon_index = unparsed.find(b":")
             if first_colon_index == -1:
