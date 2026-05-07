@@ -30,7 +30,7 @@ def decode_bencode(bencoded_value):
             res.append(int(unparsed[1:first_e_index]))
             unparsed = unparsed[first_e_index + 1 :]
         else:
-            raise NotImplementedError("Not supported")
+            break
     return res
 
 
