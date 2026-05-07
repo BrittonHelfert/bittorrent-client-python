@@ -11,11 +11,15 @@ import sys
 # - decode_bencode(b"10:hello12345") -> b"hello12345"
 def decode_bencode(bencoded_value):
     if chr(bencoded_value[0]).isdigit():
-        return decode_bencode_string(bencoded_value)
-    elif chr(bencoded_value[0]) == "i":
-        return decode_bencode_int(bencoded_value)
+        first_colon_index = bencoded_value.find(b":")
+        if first_colon_index == -1:
+            raise ValueError("Invalid encoded value")
+        return bencoded_value[first_colon_index + 1 :]
+    elif chr(bencoded_value[0]) == "i" and chr(bencoded_value[-1]) == "e":
+        # return without quotations
+        return int(bencoded_value[1:-1])
     elif chr(bencoded_value[0]) == "l":
-        return decode_bencode_list(bencoded_value)
+        return decode_bencode_list(bencoded_value[1:])
     else:
         raise ValueError("Invalid encoded value")
 
@@ -32,7 +36,7 @@ def decode_bencode_list(bencoded_value):
                 raise ValueError("Invalid encoded value")
             length = int(unparsed[:first_colon_index])
             unparsed = unparsed[first_colon_index + 1 :]
-            res.append(decode_bencode_string(unparsed[:length]))
+            res.append(unparsed[:length])
             unparsed = unparsed[length:]
         elif chr(unparsed[0]) == "i":
             first_e_index = unparsed.find(b"e")
