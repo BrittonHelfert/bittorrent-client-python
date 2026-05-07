@@ -13,6 +13,8 @@ def decode_bencode(bencoded_value):
     unparsed = bencoded_value
     res = []
     while unparsed:
+        if len(unparsed) == 0:
+            break
         if chr(unparsed[0]).isdigit():
             first_colon_index = unparsed.find(b":")
             if first_colon_index == -1:
