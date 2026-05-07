@@ -18,7 +18,7 @@ def decode_bencode(bencoded_value):
 
     print(chr(bencoded_value[0]))
     print(chr(bencoded_value[-1]))
-    if chr(bencoded_value[0]) == "l" and chr(bencoded_value[-1]) == "e":
+    if chr(bencoded_value[0]) == "i" and chr(bencoded_value[-1]) == "e":
         return bencoded_value[1:-1]
     else:
         raise NotImplementedError("Not supported")
