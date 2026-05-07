@@ -10,16 +10,26 @@ import sys
 # - decode_bencode(b"5:hello") -> b"hello"
 # - decode_bencode(b"10:hello12345") -> b"hello12345"
 def decode_bencode(bencoded_value):
-    if chr(bencoded_value[0]).isdigit():
-        first_colon_index = bencoded_value.find(b":")
-        if first_colon_index == -1:
-            raise ValueError("Invalid encoded value")
-        return bencoded_value[first_colon_index + 1 :]
-    elif chr(bencoded_value[0]) == "i" and chr(bencoded_value[-1]) == "e":
-        # return without quotations
-        return int(bencoded_value[1:-1])
-    else:
-        raise NotImplementedError("Not supported")
+    unparsed = bencoded_value.copy()
+    res = []
+    while unparsed:
+        if chr(unparsed[0]).isdigit():
+            first_colon_index = unparsed.find(b":")
+            if first_colon_index == -1:
+                raise ValueError("Invalid encoded value")
+            length = int(unparsed[:first_colon_index])
+            unparsed = unparsed[first_colon_index + 1 :]
+            res.append(unparsed[:length])
+            unparsed = unparsed[length:]
+        elif chr(unparsed[0]) == "i":
+            first_e_index = unparsed.find(b"e")
+            if first_e_index == -1:
+                raise ValueError("Invalid encoded value")
+            res.append(int(unparsed[1:first_e_index]))
+            unparsed = unparsed[first_e_index + 1 :]
+        else:
+            raise NotImplementedError("Not supported")
+    return res
 
 
 def main():
