@@ -10,7 +10,7 @@ import sys
 # - decode_bencode(b"5:hello") -> b"hello"
 # - decode_bencode(b"10:hello12345") -> b"hello12345"
 def decode_bencode(bencoded_value):
-    unparsed = bencoded_value.copy()
+    unparsed = bencoded_value
     res = []
     while unparsed:
         if chr(unparsed[0]).isdigit():
