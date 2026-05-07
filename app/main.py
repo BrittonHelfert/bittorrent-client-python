@@ -28,11 +28,14 @@ def decode_bencode_list(bencoded_value):
     unparsed = bencoded_value
     res = []
     while unparsed:
-        print(unparsed)
         if len(unparsed) == 0:
             break
         if chr(unparsed[0]) == "l":
-            res.append(decode_bencode_list(unparsed[1:]))
+            l = decode_bencode_list(unparsed[1:])
+            res.append(l)
+            character_length_of_l = sum([len(str(item)) for item in l])
+            unparsed = unparsed[1 + character_length_of_l :]
+
         if chr(unparsed[0]) == "e":
             break
         if chr(unparsed[0]).isdigit():
