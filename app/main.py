@@ -22,7 +22,7 @@ def decode_bencode(bencoded_value):
         raise ValueError("Invalid encoded value")
 
 
-def decode_bencode_string(bytes: bytes) -> Tuple[str, int]:
+def decode_bencode_string(bytes: bytes) -> Tuple[bytes, int]:
     unparsed = bytes
     bytes_consumed = 0
     if chr(unparsed[0]).isdigit():
@@ -33,7 +33,7 @@ def decode_bencode_string(bytes: bytes) -> Tuple[str, int]:
         bytes_consumed = first_colon_index + 1 + length
     else:
         raise ValueError("Expected integer, got " + str(unparsed))
-    return (unparsed[first_colon_index + 1 : bytes_consumed].decode(), bytes_consumed)
+    return (unparsed[first_colon_index + 1 : bytes_consumed], bytes_consumed)
 
 
 def decode_bencode_int(bytes: bytes) -> Tuple[int, int]:
@@ -88,6 +88,7 @@ def decode_bencode_dict(unparsed_bytes: bytes) -> Tuple[dict, int]:
         if not unparsed:
             raise ValueError("Unexpected end of input")
         elif chr(unparsed[0]) == "e":
+            bytes_consumed += 1
             break
         decoded_key, bytes_consumed_key = decode_bencode_string(unparsed)
         unparsed = unparsed[bytes_consumed_key:]
