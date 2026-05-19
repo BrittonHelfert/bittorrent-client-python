@@ -107,6 +107,8 @@ def decode_bencode_value(unparsed_bytes: bytes) -> Tuple[Any, int]:
         raise ValueError("Unexpected end of input")
     elif chr(unparsed_bytes[0]).isdigit():
         return decode_bencode_string(unparsed_bytes)
+    elif chr(unparsed_bytes[0]) == "i":
+        return decode_bencode_int(unparsed_bytes)
     elif chr(unparsed_bytes[0]) == "l":
         return decode_bencode_list(unparsed_bytes)
     elif chr(unparsed_bytes[0]) == "d":
