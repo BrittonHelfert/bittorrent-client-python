@@ -123,7 +123,7 @@ def parse_file_info(bencoded_value: bytes):
     try:
         decoded_dict, _ = decode_bencode_dict(bencoded_value[1:])
         print(f"Tracker URL: {decoded_dict[b'announce'].decode()}")
-        print(f"Length: {decoded_dict[b'info'][b'length'].decode()}")
+        print(f"Length: {decoded_dict[b'info'][b'length']}")
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
 
