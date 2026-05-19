@@ -164,7 +164,11 @@ def parse_file_info(bencoded_value: bytes):
         print(f"Length: {decoded_dict[b'info'][b'length']}")
         print(f"Info Hash: {hashlib.sha1(encoded_info).hexdigest()}")
         print(f"Piece Length: {decoded_dict[b'info'][b'piece length']}")
-        hashes = [bytes.decode() for bytes in decoded_dict[b"info"][b"pieces"]]
+        # split hashes into 20-byte chunks
+        hashes = [
+            decoded_dict[b"info"][b"pieces"][i : i + 20]
+            for i in range(0, len(decoded_dict[b"info"][b"pieces"]), 20)
+        ]
         print(f"Piece Hashes: {hashes}")
 
     except Exception as e:
