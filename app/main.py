@@ -127,11 +127,11 @@ def bencode_dict(dict: dict) -> bytes:
 
 
 def bencode_string(bytes: bytes) -> bytes:
-    return len(bytes).to_bytes(1, "big") + b":" + bytes
+    return str(len(bytes)).encode() + b":" + bytes
 
 
 def bencode_int(number: int) -> bytes:
-    return b"i" + number.to_bytes(1, "big") + b"e"
+    return b"i" + str(number).encode() + b"e"
 
 
 def bencode_list(list: list) -> bytes:
