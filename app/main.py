@@ -1,16 +1,9 @@
 import json
 import sys
-from quopri import decode
+from calendar import c
 from typing import Any, List, Tuple
 
-# import bencodepy - available if you need it!
-# import requests - available if you need it!
 
-
-# Examples:
-#
-# - decode_bencode(b"5:hello") -> b"hello"
-# - decode_bencode(b"10:hello12345") -> b"hello12345"
 def decode_bencode(bencoded_value):
     if chr(bencoded_value[0]).isdigit():
         first_colon_index = bencoded_value.find(b":")
@@ -23,8 +16,38 @@ def decode_bencode(bencoded_value):
     elif chr(bencoded_value[0]) == "l" and chr(bencoded_value[-1]) == "e":
         decoded_list, _ = decode_bencode_list(bencoded_value[1:])
         return decoded_list
+    elif chr(bencoded_value[0]) == "d" and chr(bencoded_value[-1]) == "e":
+        decoded_dict, _ = decode_bencode_dict(bencoded_value[1:])
+        return decoded_dict
     else:
         raise ValueError("Invalid encoded value")
+
+
+def decode_bencode_string(bytes: bytes) -> Tuple[str, int]:
+    unparsed = bytes
+    bytes_consumed = 0
+    if chr(unparsed[0]).isdigit():
+        first_colon_index = unparsed.find(b":")
+        if first_colon_index == -1:
+            raise ValueError("Invalid encoded value")
+        length = int(unparsed[:first_colon_index])
+        bytes_consumed = first_colon_index + 1 + length
+    else:
+        raise ValueError("Expected integer, got " + str(unparsed))
+    return (str(unparsed[first_colon_index + 1 : bytes_consumed]), bytes_consumed)
+
+
+def decode_bencode_int(bytes: bytes) -> Tuple[int, int]:
+    unparsed = bytes
+    bytes_consumed = 0
+    if chr(unparsed[0]) == "i":
+        first_e_index = unparsed.find(b"e")
+        if first_e_index == -1:
+            raise ValueError("Invalid encoded value")
+        bytes_consumed += first_e_index + 1
+    else:
+        raise ValueError("Expected int, got " + str(unparsed))
+    return (int(unparsed[1:first_e_index]), bytes_consumed)
 
 
 def decode_bencode_list(unparsed_bytes: bytes) -> Tuple[List[Any], int]:
@@ -43,24 +66,53 @@ def decode_bencode_list(unparsed_bytes: bytes) -> Tuple[List[Any], int]:
             bytes_consumed += 1
             break
         if chr(unparsed[0]).isdigit():
-            first_colon_index = unparsed.find(b":")
-            if first_colon_index == -1:
-                raise ValueError("Invalid encoded value")
-            length = int(unparsed[:first_colon_index])
-            unparsed = unparsed[first_colon_index + 1 :]
-            res.append(unparsed[:length])
-            unparsed = unparsed[length:]
-            bytes_consumed += first_colon_index + 1 + length
+            decoded_string, bytes_consumed_s = decode_bencode_string(unparsed)
+            res.append(decoded_string)
+            bytes_consumed += bytes_consumed_s
+            unparsed = unparsed[bytes_consumed_s:]
         elif chr(unparsed[0]) == "i":
-            first_e_index = unparsed.find(b"e")
-            if first_e_index == -1:
-                raise ValueError("Invalid encoded value")
-            res.append(int(unparsed[1:first_e_index]))
-            unparsed = unparsed[first_e_index + 1 :]
-            bytes_consumed += first_e_index + 1
+            decoded_int, bytes_consumed_i = decode_bencode_int(unparsed)
+            res.append(decoded_int)
+            unparsed = unparsed[bytes_consumed_i:]
+            bytes_consumed += bytes_consumed_i
         else:
             break
     return (res, bytes_consumed)
+
+
+def decode_bencode_dict(unparsed_bytes: bytes) -> Tuple[dict, int]:
+    # keys must be strings, values can be any bencode type
+    unparsed = unparsed_bytes
+    bytes_consumed = 0
+    res = {}
+    while True:
+        if not unparsed:
+            raise ValueError("Unexpected end of input")
+        elif chr(unparsed[0]) == "e":
+            break
+        decoded_key, bytes_consumed_key = decode_bencode_string(unparsed)
+        unparsed = unparsed[bytes_consumed_key:]
+        bytes_consumed += bytes_consumed_key
+        if not unparsed:
+            raise ValueError("Unexpected end of input")
+        decoded_value, bytes_consumed_v = decode_bencode_value(unparsed)
+        unparsed = unparsed[bytes_consumed_v:]
+        bytes_consumed += bytes_consumed_v
+        res[decoded_key] = decoded_value
+    return (res, bytes_consumed)
+
+
+def decode_bencode_value(unparsed_bytes: bytes) -> Tuple[Any, int]:
+    if not unparsed_bytes:
+        raise ValueError("Unexpected end of input")
+    elif chr(unparsed_bytes[0]).isdigit():
+        return decode_bencode_string(unparsed_bytes)
+    elif chr(unparsed_bytes[0]) == "l":
+        return decode_bencode_list(unparsed_bytes)
+    elif chr(unparsed_bytes[0]) == "d":
+        return decode_bencode_dict(unparsed_bytes)
+    else:
+        raise ValueError(f"Invalid encoded value: {unparsed_bytes}")
 
 
 def main():
