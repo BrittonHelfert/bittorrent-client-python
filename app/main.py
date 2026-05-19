@@ -166,7 +166,7 @@ def parse_file_info(bencoded_value: bytes):
         print(f"Piece Length: {decoded_dict[b'info'][b'piece length']}")
         # split hashes into 20-byte chunks
         hashes = [
-            decoded_dict[b"info"][b"pieces"][i : i + 20]
+            decoded_dict[b"info"][b"pieces"][i : i + 20].hex()
             for i in range(0, len(decoded_dict[b"info"][b"pieces"]), 20)
         ]
         print(f"Piece Hashes: {hashes}")
