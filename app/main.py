@@ -163,6 +163,9 @@ def parse_file_info(bencoded_value: bytes):
         print(f"Tracker URL: {decoded_dict[b'announce'].decode()}")
         print(f"Length: {decoded_dict[b'info'][b'length']}")
         print(f"Info Hash: {hashlib.sha1(encoded_info).hexdigest()}")
+        print(f"Piece Length: {decoded_dict[b'info'][b'piece length']}")
+        print(f"Piece Hashes: {decoded_dict[b'info'][b'pieces']}")
+
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
 
