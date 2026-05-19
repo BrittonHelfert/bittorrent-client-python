@@ -122,8 +122,8 @@ def parse_file_info(bencoded_value: bytes):
         raise ValueError("Invalid torrent file: must be a dictionary")
     try:
         decoded_dict, _ = decode_bencode_dict(bencoded_value[1:])
-        print(f"Tracker URL: {decoded_dict['announce']}")
-        print(f"Length: {decoded_dict['info']['length']}")
+        print(f"Tracker URL: {decoded_dict[b'announce'].decode()}")
+        print(f"Length: {decoded_dict[b'info'][b'length'].decode()}")
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
 
@@ -144,11 +144,18 @@ def main():
         def bytes_to_str(data):
             if isinstance(data, bytes):
                 return data.decode()
+            if isinstance(data, list):
+                return [bytes_to_str(item) for item in data]
+            if isinstance(data, dict):
+                return {
+                    bytes_to_str(key): bytes_to_str(value)
+                    for key, value in data.items()
+                }
 
-            raise TypeError(f"Type not serializable: {type(data)}")
+            return data
 
         # TODO: Uncomment the code below to pass the first stage
-        print(json.dumps(decode_bencode(bencoded_value), default=bytes_to_str))
+        print(json.dumps(bytes_to_str(decode_bencode(bencoded_value))))
     elif command == "info":
         with open(sys.argv[2], "rb") as f:
             bencoded_value = f.read()
