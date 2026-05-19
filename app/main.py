@@ -120,7 +120,7 @@ def parse_file_info(bencoded_value: bytes):
     try:
         decoded_dict, _ = decode_bencode_dict(bencoded_value)
         print(f"Tracker URL: {decoded_dict['announce']}")
-        print(f"PLength: {decoded_dict['info']['piece length']}")
+        print(f"Length: {decoded_dict['info']['length']}")
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
 
@@ -149,7 +149,7 @@ def main():
     elif command == "info":
         with open(sys.argv[2], "rb") as f:
             bencoded_value = f.read()
-
+        parse_file_info(bencoded_value)
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
