@@ -160,8 +160,9 @@ def parse_file_info(bencoded_value: bytes):
     try:
         decoded_dict, _ = decode_bencode_dict(bencoded_value[1:])
         encoded_info = bencode_dict(decoded_dict[b"info"])
-        print(f"Original bencoded dict: {bencoded_value[1:].decode()}")
-        print(f"Encoded info: {encoded_info.decode()}")
+        decoded_encoded_info, _ = decode_bencode_dict(encoded_info[1:])
+        print(f"Original info: {decoded_dict[b'info']}")
+        print(f"Decoded encoded info: {decoded_encoded_info}")
         print(f"Tracker URL: {decoded_dict[b'announce'].decode()}")
         print(f"Length: {decoded_dict[b'info'][b'length']}")
         print(f"Info hash: {hashlib.sha1(encoded_info).hexdigest()}")
