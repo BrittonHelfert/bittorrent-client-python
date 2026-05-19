@@ -117,8 +117,10 @@ def decode_bencode_value(unparsed_bytes: bytes) -> Tuple[Any, int]:
 
 
 def parse_file_info(bencoded_value: bytes):
+    if chr(bencoded_value[0]) != "d":
+        raise ValueError("Invalid torrent file: must be a dictionary")
     try:
-        decoded_dict, _ = decode_bencode_dict(bencoded_value)
+        decoded_dict, _ = decode_bencode_dict(bencoded_value[1:])
         print(f"Tracker URL: {decoded_dict['announce']}")
         print(f"Length: {decoded_dict['info']['length']}")
     except Exception as e:
