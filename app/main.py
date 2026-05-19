@@ -116,6 +116,15 @@ def decode_bencode_value(unparsed_bytes: bytes) -> Tuple[Any, int]:
         raise ValueError(f"Invalid encoded value: {unparsed_bytes}")
 
 
+def parse_file_info(bencoded_value: bytes):
+    try:
+        decoded_dict, _ = decode_bencode_dict(bencoded_value)
+        print(f"Tracker URL: {decoded_dict['announce']}")
+        print(f"PLength: {decoded_dict['info']['piece length']}")
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+
+
 def main():
     command = sys.argv[1]
 
@@ -137,6 +146,10 @@ def main():
 
         # TODO: Uncomment the code below to pass the first stage
         print(json.dumps(decode_bencode(bencoded_value), default=bytes_to_str))
+    elif command == "info":
+        with open(sys.argv[2], "rb") as f:
+            bencoded_value = f.read()
+
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
