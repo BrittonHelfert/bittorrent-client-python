@@ -1,6 +1,5 @@
 import json
 import sys
-from calendar import c
 from typing import Any, List, Tuple
 
 
@@ -34,7 +33,7 @@ def decode_bencode_string(bytes: bytes) -> Tuple[str, int]:
         bytes_consumed = first_colon_index + 1 + length
     else:
         raise ValueError("Expected integer, got " + str(unparsed))
-    return (str(unparsed[first_colon_index + 1 : bytes_consumed]), bytes_consumed)
+    return (unparsed[first_colon_index + 1 : bytes_consumed].decode(), bytes_consumed)
 
 
 def decode_bencode_int(bytes: bytes) -> Tuple[int, int]:
