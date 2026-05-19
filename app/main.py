@@ -40,6 +40,7 @@ def decode_bencode_list(unparsed_bytes: bytes) -> Tuple[List[Any], int]:
             bytes_consumed += 1 + bytes_consumed_l
             unparsed = unparsed[1 + bytes_consumed_l :]
         if chr(unparsed[0]) == "e":
+            bytes_consumed += 1
             break
         if chr(unparsed[0]).isdigit():
             first_colon_index = unparsed.find(b":")
