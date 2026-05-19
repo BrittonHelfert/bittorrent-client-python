@@ -109,9 +109,9 @@ def decode_bencode_value(unparsed_bytes: bytes) -> Tuple[Any, int]:
     elif chr(unparsed_bytes[0]) == "i":
         return decode_bencode_int(unparsed_bytes)
     elif chr(unparsed_bytes[0]) == "l":
-        return decode_bencode_list(unparsed_bytes)
+        return decode_bencode_list(unparsed_bytes[1:])
     elif chr(unparsed_bytes[0]) == "d":
-        return decode_bencode_dict(unparsed_bytes)
+        return decode_bencode_dict(unparsed_bytes[1:])
     else:
         raise ValueError(f"Invalid encoded value: {unparsed_bytes}")
 
