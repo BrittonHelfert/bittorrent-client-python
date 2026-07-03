@@ -3,6 +3,7 @@ import sys
 
 from .bencode import decode
 from .torrent import Torrent
+from .tracker import get_peers
 
 
 def bytes_to_str(data):
@@ -35,6 +36,9 @@ def main():
         print(json.dumps(bytes_to_str(decode(bencoded_value))))
     elif command == "info":
         print_torrent_info(Torrent.from_file(sys.argv[2]))
+    elif command == "peers":
+        for ip, port in get_peers(Torrent.from_file(sys.argv[2])):
+            print(f"{ip}:{port}")
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
