@@ -2,7 +2,7 @@ import hashlib
 import json
 import sys
 
-from app import bencode
+from .bencode import decode, encode
 
 
 def bytes_to_str(data):
@@ -17,9 +17,9 @@ def bytes_to_str(data):
 
 
 def parse_file_info(bencoded_value: bytes):
-    decoded = bencode.decode(bencoded_value)
+    decoded = decode(bencoded_value)
     info = decoded[b"info"]
-    encoded_info = bencode.encode(info)
+    encoded_info = encode(info)
     print(f"Tracker URL: {decoded[b'announce'].decode()}")
     print(f"Length: {info[b'length']}")
     print(f"Info Hash: {hashlib.sha1(encoded_info).hexdigest()}")
@@ -37,7 +37,7 @@ def main():
 
     if command == "decode":
         bencoded_value = sys.argv[2].encode()
-        print(json.dumps(bytes_to_str(bencode.decode(bencoded_value))))
+        print(json.dumps(bytes_to_str(decode(bencoded_value))))
     elif command == "info":
         with open(sys.argv[2], "rb") as f:
             bencoded_value = f.read()
