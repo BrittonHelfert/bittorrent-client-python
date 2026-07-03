@@ -1,8 +1,8 @@
-import hashlib
 import json
 import sys
 
-from .bencode import decode, encode
+from .bencode import decode
+from .torrent import Torrent
 
 
 def bytes_to_str(data):
@@ -16,17 +16,12 @@ def bytes_to_str(data):
     return data
 
 
-def parse_file_info(bencoded_value: bytes):
-    decoded = decode(bencoded_value)
-    info = decoded[b"info"]
-    encoded_info = encode(info)
-    print(f"Tracker URL: {decoded[b'announce'].decode()}")
-    print(f"Length: {info[b'length']}")
-    print(f"Info Hash: {hashlib.sha1(encoded_info).hexdigest()}")
-    print(f"Piece Length: {info[b'piece length']}")
-    pieces = info[b"pieces"]
-    hashes = [pieces[i : i + 20].hex() for i in range(0, len(pieces), 20)]
-    print(f"Piece Hashes: {hashes}")
+def print_torrent_info(torrent: Torrent):
+    print(f"Tracker URL: {torrent.announce}")
+    print(f"Length: {torrent.length}")
+    print(f"Info Hash: {torrent.info_hash.hex()}")
+    print(f"Piece Length: {torrent.piece_length}")
+    print(f"Piece Hashes: {[h.hex() for h in torrent.piece_hashes]}")
 
 
 def main():
@@ -39,9 +34,7 @@ def main():
         bencoded_value = sys.argv[2].encode()
         print(json.dumps(bytes_to_str(decode(bencoded_value))))
     elif command == "info":
-        with open(sys.argv[2], "rb") as f:
-            bencoded_value = f.read()
-        parse_file_info(bencoded_value)
+        print_torrent_info(Torrent.from_file(sys.argv[2]))
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
